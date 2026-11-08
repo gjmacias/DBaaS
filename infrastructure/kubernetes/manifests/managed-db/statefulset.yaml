@@ -1,0 +1,81 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: managed-db
+  namespace: dbaas
+spec:
+  serviceName: managed-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: managed-db
+  template:
+    metadata:
+      labels:
+        app: managed-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: managed-db-secret
+                  key: MANAGED_DB_NAME
+
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: managed-db-secret
+                  key: MANAGED_DB_USER
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: managed-db-secret
+                  key: MANAGED_DB_PASSWORD
+
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+
+          volumeMounts:
+            - name: managed-db-storage
+              mountPath: /var/lib/postgresql/data
+
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+      volumes:
+        - name: managed-db-storage
+          persistentVolumeClaim:
+            claimName: managed-db-pvc

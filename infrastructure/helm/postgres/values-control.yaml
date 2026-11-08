@@ -1,0 +1,9 @@
+
+secret:
+  name: control-db-secret
+  databaseKey: CONTROL_DB_NAME
+  usernameKey: CONTROL_DB_USER
+  passwordKey: CONTROL_DB_PASSWORD
+
+storage:
+  size: 2Gi

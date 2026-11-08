@@ -1,0 +1,11 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: dbaas
+data:
+  CONTROL_DB_HOST: control-db
+  CONTROL_DB_PORT: "5432"
+  MANAGED_DB_HOST: managed-db
+  MANAGED_DB_PORT: "5432"

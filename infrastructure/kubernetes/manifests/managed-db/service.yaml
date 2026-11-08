@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: managed-db
+  namespace: dbaas
+spec:
+  clusterIP: None
+  selector:
+    app: managed-db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      protocol: TCP

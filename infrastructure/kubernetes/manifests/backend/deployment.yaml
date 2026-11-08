@@ -1,0 +1,83 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: dbaas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: mini-dbaas-backend:0.1.0
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+
+          # Configuración no sensible
+          envFrom:
+            - configMapRef:
+                name: backend-config
+
+          # Credenciales de control-db
+          env:
+            - name: CONTROL_DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: control-db-secret
+                  key: CONTROL_DB_NAME
+
+            - name: CONTROL_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: control-db-secret
+                  key: CONTROL_DB_USER
+
+            - name: CONTROL_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: control-db-secret
+                  key: CONTROL_DB_PASSWORD
+
+            # Credenciales de managed-db
+            - name: MANAGED_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: managed-db-secret
+                  key: MANAGED_DB_USER
+
+            - name: MANAGED_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: managed-db-secret
+                  key: MANAGED_DB_PASSWORD
+
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

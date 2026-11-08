@@ -1,0 +1,9 @@
+
+secret:
+  name: managed-db-secret
+  databaseKey: MANAGED_DB_NAME
+  usernameKey: MANAGED_DB_USER
+  passwordKey: MANAGED_DB_PASSWORD
+
+storage:
+  size: 5Gi

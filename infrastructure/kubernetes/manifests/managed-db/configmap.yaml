@@ -1,0 +1,9 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: managed-db-config
+  namespace: dbaas
+data:
+  MANAGED_DB_HOST: managed-db
+  MANAGED_DB_PORT: "5432"
