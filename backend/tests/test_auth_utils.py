@@ -6,7 +6,7 @@ from app.core import security
 
 
 PASSWORD = "TestPassword123!"
-JWT_SECRET_KEY = "test-secret-key-for-unit-tests-2026"
+JWT_SECRET_KEY_TEST = "test-secret-key-for-unit-tests-2026"
 
 def test_password_hash_and_verify():
     password = PASSWORD
@@ -32,7 +32,7 @@ def test_create_and_decode_access_token(monkeypatch):
     monkeypatch.setattr(
         security,
         "JWT_SECRET_KEY",
-        JWT_SECRET_KEY,
+        JWT_SECRET_KEY_TEST,
     )
 
     user_id = uuid4()
@@ -47,7 +47,7 @@ def test_decode_invalid_access_token(monkeypatch):
     monkeypatch.setattr(
         security,
         "JWT_SECRET_KEY",
-        JWT_SECRET_KEY,
+        JWT_SECRET_KEY_TEST,
     )
 
     try:
