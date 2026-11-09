@@ -1,13 +1,20 @@
+# Requirements for the backend FastAPI application
 fastapi
 uvicorn[standard]
 sqlalchemy
 psycopg[binary]
 pydantic-settings
 
+# For authentication
 python-dotenv
 
+# For security
 PyJWT
 pwdlib[argon2]
 
+# For testing
 pytest
 httpx2
+
+# For monitoring
+prometheus-fastapi-instrumentator

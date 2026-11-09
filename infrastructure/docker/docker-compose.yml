@@ -1,11 +1,22 @@
 services:
-  # backend:
-  #   build:                ../../backend
-  #   container_name:       dbaas-backend
-  #   restart:              unless-stopped
-  #   env_file:             [".env"]
-  #   depends_on:           ["control-db", "managed-db"]
-  #   ports:                ["127.0.0.1:8000:8000"]
+  backend:
+    image: ghcr.io/gjmacias/dbaas:latest
+    container_name: dbaas-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTROL_DB_HOST: control-db
+      CONTROL_DB_PORT: 5432
+      MANAGED_DB_HOST: managed-db
+      MANAGED_DB_PORT: 5432
+    depends_on:
+      control-db:
+        condition: service_healthy
+      managed-db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
 
   control-db:
     image:                postgres:16-alpine
