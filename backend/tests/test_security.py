@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from tests.test_auth_utils import security, JWT_SECRET_KEY_TEST
 
 client = TestClient(app)
 
@@ -11,7 +12,13 @@ def test_list_databases_without_token():
     assert response.status_code == 401
 
 
-def test_list_databases_with_invalid_token():
+def test_list_databases_with_invalid_token(monkeypatch):
+    monkeypatch.setattr(
+        security,
+        "JWT_SECRET_KEY",
+        JWT_SECRET_KEY_TEST,
+    )
+
     response = client.get(
         "/api/v1/databases",
         headers={"Authorization": "Bearer invalid-token"},
