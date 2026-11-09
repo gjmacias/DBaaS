@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: mini-dbaas-backend:0.1.0
+          image: ghcr.io/gjmacias/dbaas:latest
           imagePullPolicy: IfNotPresent
 
           ports:

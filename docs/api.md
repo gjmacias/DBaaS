@@ -1,93 +1,79 @@
+# API Documentation
 
-# Mini DBaaS - API Specification
+## Overview
 
-## 1. Overview
+The Mini DBaaS API is built with FastAPI and exposes REST endpoints to manage databases and platform users.
 
-REST API for requesting and managing PostgreSQL databases.
+Interactive API documentation is available through Swagger UI at:
 
-Base path: `/api/v1`
+`/docs`
 
-## 2. Authentication
+API routes are grouped under `/api/v1`, except health and monitoring endpoints.
 
-All endpoints require authentication.
+## Authentication
 
-The API identifies the requesting user and checks resource ownership before allowing operations.
+The API uses JWT Bearer authentication.
 
-## 3. Endpoints
+Protected endpoints require a valid access token in the `Authorization` header:
 
-### POST /databases
+`Authorization: Bearer <access_token>`
 
-Request a new PostgreSQL database.
+Users must authenticate before accessing protected resources.
 
-Request body:
+## Roles and permissions
 
-```json
-{
-  "name": "project_alpha",
-  "engine": "postgresql",
-  "version": "16",
-  "resources": {
-    "storage_mb": 1024,
-    "max_connections": 20
-  }
-}
-```
+The platform currently defines three roles:
 
-Success response: `202 Accepted`
+| Role | Permissions |
+|---|---|
+| `admin` | Full database CRUD operations, user creation and listing, table creation and read access. |
+| `user` | Database operations according to ownership and authorization rules, table creation and read access. |
+| `viewer` | Read-only access to databases and their data. |
 
-```json
-{
-  "id": "db-001",
-  "name": "project_alpha",
-  "status": "REQUESTED"
-}
-```
+User management is restricted to administrators.
 
-### GET /databases
+## Available endpoints
 
-List databases owned by the authenticated user.
+### Authentication
 
-Success response: `200 OK`
+| Method | Endpoint | Description | Authentication |
+|---|---|---|---|
+| POST | `/api/v1/auth/login` | Authenticate and obtain a JWT token. | No |
 
-### GET /databases/{database_id}
+### Databases
 
-Retrieve database details and provisioning status.
+The API supports CRUD operations for database resources.
 
-Success response: `200 OK`
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/v1/databases` | Create and provision a database. |
+| GET | `/api/v1/databases` | List registered databases. |
+| GET | `/api/v1/databases/{database_id}` | Retrieve database details. |
+| DELETE | `/api/v1/databases/{database_id}` | Delete a database. |
 
-### DELETE /databases/{database_id}
+All database endpoints require authentication and enforce role and ownership permissions.
 
-Request database deletion.
+### Users
 
-Success response: `202 Accepted`
+User management is currently limited to administrators.
 
-## 4. Database states
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/v1/users` | Create a user. |
+| GET | `/api/v1/users` | List users. |
 
-- REQUESTED
-- PROVISIONING
-- READY
-- FAILED
-- DELETING
-- DELETED
+### Health and monitoring
 
-## 5. Error responses
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/health` | Check whether the API process is running. |
+| GET | `/ready` | Check whether the Control DB is reachable. |
+| GET | `/metrics` | Expose Prometheus metrics. |
 
-- `400 Bad Request`: Invalid request.
-- `401 Unauthorized`: Authentication required.
-- `403 Forbidden`: Insufficient permissions.
-- `404 Not Found`: Database does not exist or is not accessible.
-- `409 Conflict`: Resource conflict.
-- `500 Internal Server Error`: Unexpected platform error.
+## Current limitations and future work
 
-## 6. Provisioning behavior
-
-Database creation and deletion are asynchronous operations.
-
-The API returns an operation identifier and the current resource status without waiting for provisioning to finish.
-
-## 7. Security
-
-- Never expose control database credentials.
-- Do not return database passwords in ordinary status responses.
-- Enforce resource ownership.
-- Apply least-privilege access to managed databases.
+- Database sharing between users is not implemented yet.
+- Row-Level Security (RLS) is planned for more granular data access.
+- MCP integration is a future improvement.
+- User management currently supports creation and listing only.
+- Table creation and data access are application-level capabilities, not a dedicated table-management API in the current documented scope.
