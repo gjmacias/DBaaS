@@ -1,3 +1,5 @@
+from click import UUID
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -5,8 +7,8 @@ from app.models.database import Database
 from app.schemas.database import DatabaseCreate
 
 
-def create(db: Session, data: DatabaseCreate) -> Database:
-    database = Database(**data.model_dump())
+def create(db: Session, data: DatabaseCreate, owner_id: UUID) -> Database:
+    database = Database(**data.model_dump(), owner_id=owner_id)
 
     db.add(database)
     db.commit()

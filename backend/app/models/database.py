@@ -1,8 +1,9 @@
+
 import uuid
 
-from sqlalchemy import DateTime, Integer, String, func
+from sqlalchemy import DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
@@ -47,6 +48,17 @@ class Database(Base):
     max_connections: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
+    )
+
+    owner_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        nullable=False,
+        index=True,
+    )
+
+    owner: Mapped["User"] = relationship(
+        back_populates="databases",
     )
 
     created_at: Mapped[DateTime] = mapped_column(

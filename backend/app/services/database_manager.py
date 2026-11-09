@@ -18,11 +18,11 @@ class DatabaseAlreadyExists(Exception):
 class DeprovisioningError(Exception):
     pass
 
-def request_database(db: Session, request: DatabaseCreate):
+def request_database(db: Session, request: DatabaseCreate, owner_id):
     database = None
 
     try:
-        database = database_repository.create(db, request)
+        database = database_repository.create(db, request, owner_id)
 
     except IntegrityError as error:
         db.rollback()
@@ -30,6 +30,7 @@ def request_database(db: Session, request: DatabaseCreate):
             f"Database '{request.name}' already exists"
         ) from error
 
+    
     try:
         database.status = "PROVISIONING"
         db.commit()

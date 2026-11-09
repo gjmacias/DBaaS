@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.database import DatabaseCreate, DatabaseResponse
 from app.services import database_manager
+from app.api.dependencies import get_current_user
+from app.models.user import User
 
 router = APIRouter(
     prefix="/databases",
@@ -20,10 +22,11 @@ router = APIRouter(
 )
 def create_database(
     request: DatabaseCreate,
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     try:
-        return database_manager.request_database(db, request)
+        return database_manager.request_database(db, request, current_user.id)
     except database_manager.DatabaseAlreadyExists as error:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -43,6 +46,8 @@ def create_database(
 )
 def list_databases(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+
 ):
     return database_manager.list_databases(db)
 
@@ -54,6 +59,7 @@ def list_databases(
 def get_database(
     database_id: UUID,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     database = database_manager.get_database(db, database_id)
 
@@ -72,7 +78,8 @@ def get_database(
 )
 def delete_database(
     database_id: UUID,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     try:
         database = database_manager.delete_database(db, database_id)

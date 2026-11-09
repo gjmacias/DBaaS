@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api.routes import health, databases, users
+from app.api.routes import health, auth, databases, users
 from app.core.database import Base, engine
 from app.models import Database
 
@@ -21,5 +21,6 @@ app = FastAPI(
 )
 
 app.include_router(health.router)
+app.include_router(auth.router, prefix="/api/v1")
 app.include_router(databases.router, prefix="/api/v1")
 app.include_router(users.router, prefix="/api/v1")

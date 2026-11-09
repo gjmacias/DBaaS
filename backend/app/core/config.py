@@ -25,3 +25,9 @@ MANAGED_DB_CONFIG = {
     "user": os.getenv("MANAGED_DB_USER"),
     "password": os.getenv("MANAGED_DB_PASSWORD"),
 }
+
+
+# JWT authentication
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+JWT_ALGORITHM = "HS256"
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = 30
